@@ -32,9 +32,10 @@ class Database:
             cursor.execute(sql)
 
         # Fetch results only for SELECT queries
-        results = []
         if sql.strip().upper().startswith("SELECT"):
             results = cursor.fetchall()
+        else:
+            results = []
 
         conn.commit()
         cursor.close()
