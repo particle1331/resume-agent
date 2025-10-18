@@ -1,3 +1,5 @@
+phase 1: 6520e30
+
 1. uv init
 2. uv venv
 
@@ -9,3 +11,30 @@ create Dockerfile
 
 docker build -t resume-agent-app .
 docker run -p 8080:8080 resume-agent-app
+
+
+phase 2: 
+1. uv add psycopg2-binary python-dotenv
+2. create .env with DB stuff
+3. create docker-compose.yml
+
+docker volume ls
+docker volume inspect postgres_data
+
+When the left side of the volumes: entry isn’t a local path (e.g., . or ./data), Docker treats it as a named volume and automatically creates it under its own storage directory.
+
+So:
+
+Syntax	Type	Where it lives
+.:/app	Bind mount	Your local filesystem
+./data:/var/lib/postgresql/data	Bind mount	Your local ./data folder
+postgres_data:/var/lib/postgresql/data	Named volume	Docker-managed, not visible locally
+
+In short:
+
+No local path on the left side → Docker-managed volume.
+
+
+
+in init db we use the same dockerfile as the app. 
+In Docker, ENTRYPOINT overrides CMD (or more precisely, it replaces the default command that would otherwise run when the container starts).
