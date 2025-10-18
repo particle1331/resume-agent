@@ -1,1 +1,11 @@
-uv init; uv venv
+1. uv init
+2. uv venv
+
+uv add flask
+create /app
+create /app/main.py (hello, world flask == main route)
+create Dockerfile
+
+
+docker build -t resume-agent-app .
+docker run -p 8080:8080 resume-agent-app
