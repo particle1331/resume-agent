@@ -38,3 +38,6 @@ No local path on the left side → Docker-managed volume.
 
 in init db we use the same dockerfile as the app. 
 In Docker, ENTRYPOINT overrides CMD (or more precisely, it replaces the default command that would otherwise run when the container starts).
+
+
+docker compose up --build

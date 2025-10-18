@@ -2,6 +2,9 @@ import os
 import time
 import psycopg2
 import psycopg2.extras
+import pandas as pd
+
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,7 +20,7 @@ class Database:
 
     def query(self, sql, parameters=None):
         """Execute a database query"""
-        conn = psycopg2.connect(
+        con = psycopg2.connect(
             host=self.host,
             user=self.user,
             password=self.password,
@@ -25,38 +28,36 @@ class Database:
             port=self.port,
         )
 
-        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur = con.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         if parameters:
-            cursor.execute(sql, parameters)
+            cur.execute(sql, parameters)
         else:
-            cursor.execute(sql)
+            cur.execute(sql)
 
         # Fetch results only for SELECT queries
         if sql.strip().upper().startswith("SELECT"):
-            results = cursor.fetchall()
+            results = cur.fetchall()
         else:
             results = []
 
-        conn.commit()
-        cursor.close()
-        conn.close()
+        con.commit()
+        cur.close()
+        con.close()
         return results
-
 
     def create_tables(self):
         """Create a simple users table"""
-        self.query(
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                email VARCHAR(100) NOT NULL UNIQUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """
-        )
-        print("✅ Table 'users' created successfully!")
-
+        dir = Path(__file__).parent / "create_tables"
+        for path in [
+            "users.sql",
+            "institutions.sql",
+            "positions.sql",
+            "experiences.sql",
+            "skills.sql"
+        ]:  # order matters
+            with open(dir / path, "r") as query_file:
+                q = "".join(query_file.readlines())
+            self.query(q)
 
     def get_all_users(self):
         """Get all users from database"""
@@ -65,26 +66,33 @@ class Database:
 
 def insert_sample_data(db):
     """Insert some sample users"""
-    users = [
-        ("Alice", "alice@email.com"),
-        ("Bob", "bob@email.com"),
-        ("Charlie", "charlie@email.com"),
-    ]
-
-    for name, email in users:
-        try:
-            db.query("INSERT INTO users (name, email) VALUES (%s, %s)", (name, email))
-        except psycopg2.errors.UniqueViolation:
-            # User already exists, skip
-            pass
-
-    print("✅ Sample data inserted!")
+    dir = Path(__file__).parent / "data"
+    for path in [
+        "users.csv",
+        "institutions.csv",
+        "positions.csv",
+        "experiences.csv",
+        "skills.csv"
+    ]:
+        data = pd.read_csv(dir / path)
+        for row in data.to_dict(orient="records"):
+            try:
+                stmt = f"""
+                    INSERT INTO {path.split(".")[0]} 
+                    ({", ".join(row.keys())})
+                    VALUES
+                    ({", ".join(["%s"] * len(row))})
+                """
+                db.query(stmt, list([v if not pd.isna(v) else None for v in row.values()]))
+            except psycopg2.errors.UniqueViolation:
+                pass
 
 
 def wait_for_db(max_retries=6, delay=5):
     for _ in range(max_retries):
         try:
             db = Database()
+            db.create_tables()
             db.query("SELECT 1")
             return db
         except:
