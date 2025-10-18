@@ -41,3 +41,83 @@ In Docker, ENTRYPOINT overrides CMD (or more precisely, it replaces the default 
 
 
 docker compose up --build
+
+
+
+phase 3
+1. npm create vue@latest frontend
+only select vue router, ESLint and Prettier. also include example starter code.
+
+src/App.vue
+<template>
+  <div id="app">
+    <router-view />
+  </div>
+</template>
+
+<script setup>
+// Empty for now
+</script>
+
+<style>
+#app {
+  font-family: sans-serif;
+  text-align: center;
+  margin-top: 2rem;
+}
+</style>
+
+
+src/views/HomeView.vue
+<template>
+  <div>
+    <h1>Hello from Vue + Flask!</h1>
+    <p>This will soon connect to your Flask backend.</p>
+  </div>
+</template>
+
+delete:
+src/components/
+src/assets/logo.svg
+src/assets/main.css
+
+add to docker compose
+  frontend:
+    container_name: resume-agent-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - VITE_API_BASE=http://flask-app:8080/api
+    depends_on:
+      - flask-app
+
+In frontend/vite.config.js connects vue to the flask backend:
+export default defineConfig({
+  server: {
+    host: true,
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://flask-app:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+});
+
+Now any fetch("/api/...") in Vue will reach your Flask app.
+
+
+- /app/node_modules
+That tells Docker:
+
+“Mount my project files from the host, but keep node_modules inside the container.”
+
+Without that, the bind mount ./frontend:/app hides the installed dependencies.
+

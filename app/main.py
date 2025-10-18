@@ -29,15 +29,14 @@ def users():
 
     html = "<h1>Users in Database</h1>"
     html += "<table border='1' cellpadding='10'>"
-    html += "<tr><th>ID</th><th>Name</th><th>Email</th><th>Created At</th></tr>"
+    html += "<tr><th>ID</th><th>Name</th><th>Email</th></tr>"
 
     for user in users:
         html += f"""
         <tr>
-            <td>{user['id']}</td>
-            <td>{user['name']}</td>
+            <td>{user['user_id']}</td>
+            <td>{user['role']}</td>
             <td>{user['email']}</td>
-            <td>{user['created_at']}</td>
         </tr>
         """
 
@@ -53,11 +52,7 @@ def users_json():
     if not db:
         return jsonify({"error": "Database not connected"})
 
-    # Convert datetime objects to strings for JSON serialization
     users = db.get_all_users()
-    for user in users:
-        user["created_at"] = str(user["created_at"])
-
     return jsonify({"users": users})
 
 

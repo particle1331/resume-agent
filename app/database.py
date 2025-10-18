@@ -61,7 +61,7 @@ class Database:
 
     def get_all_users(self):
         """Get all users from database"""
-        return self.query("SELECT * FROM users ORDER BY id")
+        return self.query("SELECT * FROM users ORDER BY user_id")
 
 
 def insert_sample_data(db):
