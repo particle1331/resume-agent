@@ -26,10 +26,6 @@ def login():
         
         db = Database()
         user = db.query("SELECT * FROM users WHERE email = %s", [email])
-        
-        print(password)
-        print(user[0]['password'] if user else 'No user found')
-
         if user and check_password_hash(user[0]['password'], password):
             login_user(User(user[0]))
             return redirect(url_for('resume'))
