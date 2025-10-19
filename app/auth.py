@@ -1,16 +1,19 @@
-from flask import Blueprint, request, redirect, url_for, render_template
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from .database import Database
+from werkzeug.security import check_password_hash
 
-auth_bp = Blueprint('auth', __name__)
+from app.database import Database
+
+auth_bp = Blueprint("auth", __name__)
 login_manager = LoginManager()
+
 
 class User(UserMixin):
     def __init__(self, user_data):
-        self.id = user_data['user_id']
-        self.email = user_data['email']
-        self.tokens = user_data.get('tokens', 100)
+        self.id = user_data["user_id"]
+        self.email = user_data["email"]
+        self.tokens = user_data.get("tokens", 100)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -18,23 +21,24 @@ def load_user(user_id):
     user_data = db.query("SELECT * FROM users WHERE user_id = %s", [user_id])
     return User(user_data[0]) if user_data else None
 
-@auth_bp.route('/login', methods=['GET', 'POST'])
+
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
+    if request.method == "POST":
+        email    = request.form.get("email")
+        password = request.form.get("password")
         db = Database()
         user = db.query("SELECT * FROM users WHERE email = %s", [email])
-        if user and check_password_hash(user[0]['password'], password):
-            login_user(User(user[0]))
-            return redirect(url_for('resume'))
-            
-        return "Invalid credentials", 401
-        
-    return render_template('login.html')
 
-@auth_bp.route('/logout')
+        if user and check_password_hash(user[0]["password"], password):
+            login_user(User(user[0]))
+            return redirect(url_for("resume"))
+
+        return "Invalid credentials", 401
+    return render_template("login.html")
+
+
+@auth_bp.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for("auth.login"))

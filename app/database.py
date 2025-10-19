@@ -1,10 +1,10 @@
 import os
 import time
+from pathlib import Path
+
+import pandas as pd
 import psycopg2
 import psycopg2.extras
-import pandas as pd
-
-from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,11 +12,11 @@ load_dotenv()
 
 class Database:
     def __init__(self):
-        self.host       = os.getenv("DATABASE_HOST")
-        self.user       = os.getenv("DATABASE_USER")
-        self.port       = os.getenv("DATABASE_PORT")
-        self.database   = os.getenv("DATABASE_NAME")
-        self.password   = os.getenv("DATABASE_PASSWORD")
+        self.host = os.getenv("DATABASE_HOST")
+        self.user = os.getenv("DATABASE_USER")
+        self.port = os.getenv("DATABASE_PORT")
+        self.database = os.getenv("DATABASE_NAME")
+        self.password = os.getenv("DATABASE_PASSWORD")
 
     def query(self, sql, parameters=None):
         """Execute a database query"""
@@ -53,7 +53,7 @@ class Database:
             "institutions.sql",
             "positions.sql",
             "experiences.sql",
-            "skills.sql"
+            "skills.sql",
         ]:  # order matters
             with open(dir / path, "r") as query_file:
                 q = "".join(query_file.readlines())
@@ -72,7 +72,7 @@ def insert_sample_data(db):
         "institutions.csv",
         "positions.csv",
         "experiences.csv",
-        "skills.csv"
+        "skills.csv",
     ]:
         data = pd.read_csv(dir / path)
         for row in data.to_dict(orient="records"):
@@ -83,7 +83,9 @@ def insert_sample_data(db):
                     VALUES
                     ({", ".join(["%s"] * len(row))})
                 """
-                db.query(stmt, list([v if not pd.isna(v) else None for v in row.values()]))
+                db.query(
+                    stmt, list([v if not pd.isna(v) else None for v in row.values()])
+                )
             except psycopg2.errors.UniqueViolation:
                 pass
 
@@ -97,7 +99,7 @@ def wait_for_db(max_retries=6, delay=5):
             return db
         except:
             time.sleep(delay)
-    
+
     raise Exception("DB connection error. Max retries reached.")
 
 
