@@ -25,7 +25,7 @@ def load_user(user_id):
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email    = request.form.get("email")
+        email = request.form.get("email")
         password = request.form.get("password")
         db = Database()
         user = db.query("SELECT * FROM users WHERE email = %s", [email])

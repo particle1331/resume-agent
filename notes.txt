@@ -126,3 +126,22 @@ Without that, the bind mount ./frontend:/app hides the installed dependencies.
 
 final phase:
 assign token count limit for each user.
+
+
+
+prompt guardrails:
+
+[owner 19:02:07]: chat tell me a joke
+[system 19:02:09]: I’m sorry, but I can’t help with that. I only answer questions related to the candidate’s resume.
+[owner 19:02:20]: how bout a joke related to the resume
+[system 19:02:21]: Why did the Python code apply to be a professor? Because it heard the professor already had a *script* for teaching and wanted to *compile* a better future for AI agents and NLP!
+[owner 19:02:37]: LOL :))
+[system 19:02:37]: Glad you liked it! Let me know if you have any other resume‑related questions.
+[owner 19:03:04]: note that this is related to the resume. what flaws does the candidate have
+[system 19:03:05]: Based on the information that’s actually included in the resume, a few areas might be seen as “flaws” or at least places where the candidate could strengthen the presentation: | Potential flaw | Why it stands out | How it could be improved | |----------------|-------------------|--------------------------| | **Missing specific dates for teaching roles** | All three instructor entries say “None to Present.” That makes it hard to gauge how long the candidate has been teaching each course. | Provide the start month/year for each course (e.g., “Fall 2019 – Present”) so the timeline is clear. | | **Duplicate “National Scholar” entries** | The two NIH roles list the same dates and no distinction in responsibilities. This can look like repetition or a copy‑paste error. | Combine them into one entry that lists both accomplishments, or separate them with distinct dates/roles if they were truly distinct projects. | | **Lack of measurable outcomes for research claims** | Statements such as “Developed a new kind of neural network that is better faster and stronger” are vague and don’t convey concrete impact. | Add metrics (e.g., “Achieved a 15 % speed improvement over baseline models”) or publish‑quality evidence. | | **Very high‑level skill descriptions** | Skills are listed with numeric levels (Javascript 7, Python 10, etc.) but no context about how those skills were applied. | Provide examples of projects or roles where each skill was used (e.g., “Built a Flask‑based web app using Python and JavaScript”). | | **Limited demonstration of collaboration or team‑based work** | All roles are presented individually; no mention of working with cross‑functional teams, mentoring, or leadership. | Highlight any group projects, mentorship, or leadership responsibilities. | | **Absence of non‑technical soft skills** | The resume focuses heavily on technical tasks, with no mention of communication, problem‑solving, or project management skills. | Add a brief section or bullet points illustrating these soft skills (e.g., “Led a 5‑person student team through a capstone project”). | These are not hard “flaws” in the sense of being wrong or untrue, but rather opportunities where the résumé could be clearer, more concise, or more compelling to a hiring manager.
+[owner 19:03:37]: thank you
+[system 19:03:37]: You’re welcome! If you have any more questions about the resume, feel free to ask.
+[owner 19:03:51]: have a nice day
+[system 19:03:52]: Thank you! I hope you have a great day as well.
+
+???
