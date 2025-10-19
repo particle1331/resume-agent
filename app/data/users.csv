@@ -1,3 +1,3 @@
 "role","email","password"
-"owner","owner@email.com","password"
-"guest","guest@email.com","password"
+"owner","owner@email.com","scrypt:32768:8:1$UWHtBPrIl4QA1f0r$bcd5962d291a7e1eda8b0ca5a1d9ecc9cba3c7815c3f6a71b28e130b3944403579b93c448a2a079e78a89ad0fd30a664b3fd0e09f9d1106a0d67f224b018d83e"
+"guest","guest@email.com","scrypt:32768:8:1$UWHtBPrIl4QA1f0r$bcd5962d291a7e1eda8b0ca5a1d9ecc9cba3c7815c3f6a71b28e130b3944403579b93c448a2a079e78a89ad0fd30a664b3fd0e09f9d1106a0d67f224b018d83e"
