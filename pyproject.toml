@@ -12,6 +12,7 @@ dependencies = [
     "flask-socketio>=5.5.1",
     "flask-login>=0.6.3",
     "flask-sock>=0.7.0",
+    "groq>=0.32.0",
 ]
 
 [build-system]

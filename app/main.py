@@ -7,6 +7,21 @@ from flask_sock import Sock
 from flask_login import LoginManager, login_required, current_user
 from datetime import datetime
 
+from dotenv import load_dotenv
+load_dotenv()
+
+from groq import Groq
+
+def send_message(client: Groq, messages: list[dict]) -> str:
+    completion = client.chat.completions.create(
+        model="openai/gpt-oss-20b",
+        messages=messages
+    )
+    return completion.choices[0].message.content
+
+client = Groq()
+
+
 db = wait_for_db()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'  # Change this in production!
@@ -38,6 +53,31 @@ def resume():
 @sock.route('/ws/chat')
 @login_required
 def chat(ws):
+    experiences = db.query("""
+        SELECT e.*, p.title, i.name as institution
+        FROM experiences e
+        JOIN positions p ON e.position_id = p.position_id
+        JOIN institutions i ON p.inst_id = i.inst_id
+        ORDER BY e.start_date DESC
+    """)
+    skills = db.query("SELECT * FROM skills")
+    print(experiences)
+    print(skills)
+
+    messages = [
+        {"role": "system", "content": f"""
+         You are a helpful assistant. Answer questions about the candidates's resume based on the provided information.
+         If the information is not available, respond with "I don't know". Do not make up answers. Do not answer
+         questions unrelated to the resume. Refuse to answer anything inappropriate or offensive. Refuse to answer
+         anything irrelevant to the candidates's resume. Refuse to answer personal questions about the candidates.
+
+         Here is the candidates resume:
+            Experiences:
+            {"\n".join([f"- {exp['title']} at {exp['institution']} from {exp['start_date']} to {exp['end_date'] or 'Present'}: {exp['description']}" for exp in experiences])}
+            Skills:
+            {", ".join([skill['name'] + f'(lvl: {skill["skill_level"]})' for skill in skills])}
+        """}
+    ]
     try:
         while True:
             data = ws.receive()
@@ -50,9 +90,12 @@ def chat(ws):
             
             print(f"Sending message: {formatted_message}")  # Debug logging
             ws.send(json.dumps({"text": formatted_message}))
+            messages.append({"role": "user", "content": message_data['message']})
+            response = send_message(client, messages)
+            messages.append({"role": "assistant", "content": response})
 
             timestamp = datetime.now().strftime('%H:%M:%S')
-            ws.send(json.dumps({"text": f"[system {timestamp}]: <i>Message received</i>"}))
+            ws.send(json.dumps({"text": f"[system {timestamp}]: {response}"}))
     except Exception as e:
         print(f"WebSocket error: {e}")  # Debug logging
         raise
